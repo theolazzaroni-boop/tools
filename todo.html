@@ -13,6 +13,7 @@
   --bg: #111110;
   --surface: #1a1917;
   --surface2: #222120;
+  --surface3: #2a2826;
   --border: #2a2826;
   --border-hover: #3a3835;
   --text: #e8e4df;
@@ -25,7 +26,8 @@
   --yellow: #e8c87a;
   --red: #e07a6d;
   --red-dim: rgba(224,122,109,0.1);
-  --gray: #4a4845;
+  --blue: #7ab8e0;
+  --blue-dim: rgba(122,184,224,0.1);
 }
 
 body {
@@ -34,50 +36,69 @@ body {
   font-family: 'DM Mono', monospace;
   font-weight: 300;
   min-height: 100vh;
-  padding: 40px 24px 80px;
+  overflow-x: hidden;
 }
 
-.page { max-width: 600px; margin: 0 auto; }
-
+/* ── Header ── */
 .header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 36px;
+  padding: 28px 28px 0;
+  margin-bottom: 24px;
   opacity: 0;
   animation: fadeUp 0.5s ease forwards;
 }
 
 .title {
   font-family: 'Instrument Serif', serif;
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 400;
   color: var(--text);
   letter-spacing: -0.02em;
 }
 .title em { font-style: italic; color: var(--accent); }
 
-.task-count { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; }
+.header-right { display: flex; align-items: center; gap: 10px; }
 
-/* Add form */
+.view-toggle {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.view-btn {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.view-btn.active { background: var(--surface2); color: var(--text); }
+
+/* ── Add form ── */
 .add-form {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-  margin-bottom: 32px;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 0 28px 24px;
   opacity: 0;
   animation: fadeUp 0.5s ease 0.1s forwards;
 }
 
-.add-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.add-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
 
 .add-input {
   flex: 1;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   color: var(--text);
   font-family: 'DM Mono', monospace;
   font-size: 13px;
@@ -90,134 +111,127 @@ body {
 
 .add-btn {
   background: var(--accent);
-  color: #111110;
+  color: #111;
   border: none;
   border-radius: 8px;
-  width: 42px;
-  height: 42px;
-  font-size: 20px;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
   cursor: pointer;
   transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.add-btn:hover { background: #f0d48a; transform: scale(1.05); }
+.add-btn:hover { background: #f0d48a; }
 
-.add-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.select-group { display: flex; gap: 4px; }
+.add-meta { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .pill {
-  padding: 5px 10px;
+  padding: 4px 10px;
   border-radius: 6px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
   font-family: 'DM Mono', monospace;
   font-size: 10px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   cursor: pointer;
   transition: all 0.15s;
-  white-space: nowrap;
 }
 .pill:hover { border-color: var(--border-hover); color: var(--text); }
-.pill.active-statut-aujourd { border-color: var(--red); color: var(--red); background: var(--red-dim); }
-.pill.active-statut-semaine { border-color: var(--yellow); color: var(--yellow); background: var(--accent-dim); }
-.pill.active-statut-backlog { border-color: var(--gray); color: #8a8580; background: rgba(74,72,69,0.2); }
-.pill.active-effort-petit { border-color: var(--green); color: var(--green); background: var(--green-dim); }
-.pill.active-effort-moyen { border-color: var(--yellow); color: var(--yellow); background: var(--accent-dim); }
-.pill.active-effort-lourd { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.pill.active-s-aujourd { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+.pill.active-s-semaine { border-color: var(--yellow); color: var(--yellow); background: var(--accent-dim); }
+.pill.active-s-backlog { border-color: #6b6560; color: #8a8580; background: rgba(74,72,69,0.2); }
+.pill.active-e-petit { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.pill.active-e-moyen { border-color: var(--yellow); color: var(--yellow); background: var(--accent-dim); }
+.pill.active-e-lourd { border-color: var(--red); color: var(--red); background: var(--red-dim); }
 
-/* Filters */
-.filters {
+/* ── Kanban ── */
+.kanban {
   display: flex;
-  gap: 6px;
-  margin-bottom: 20px;
+  gap: 12px;
+  padding: 0 28px 40px;
+  overflow-x: auto;
+  align-items: flex-start;
   opacity: 0;
   animation: fadeUp 0.5s ease 0.2s forwards;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  min-height: calc(100vh - 200px);
 }
 
-.filter-btn {
-  padding: 6px 12px;
-  border-radius: 20px;
+.kanban-col {
+  flex: 0 0 260px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-muted);
-  font-family: 'DM Mono', monospace;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 200px;
+  transition: border-color 0.2s;
+}
+.kanban-col.drag-over { border-color: var(--accent); background: rgba(232,200,122,0.03); }
+
+.col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.col-title {
   font-size: 10px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
+  font-weight: 400;
 }
-.filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
-.filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-
-/* Task list */
-.task-list { opacity: 0; animation: fadeUp 0.5s ease 0.3s forwards; }
-
-.task-group { margin-bottom: 28px; }
-
-.group-label {
-  font-size: 9px;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-.task-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 14px;
+.col-count {
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--surface2);
+  padding: 2px 7px;
   border-radius: 10px;
-  border: 1px solid transparent;
-  margin-bottom: 4px;
-  transition: all 0.15s;
 }
-.task-item:hover { background: var(--surface); border-color: var(--border); }
 
-.task-check {
-  width: 18px;
-  height: 18px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: all 0.15s;
+.col-body {
+  padding: 10px;
+  min-height: 120px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
+  flex-direction: column;
+  gap: 6px;
 }
-.task-check:hover { border-color: var(--green); background: var(--green-dim); }
-.task-check.done { background: var(--green); border-color: var(--green); color: #111; }
 
-.task-name {
-  flex: 1;
-  font-size: 13px;
-  font-weight: 300;
+/* ── Task card ── */
+.task-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 13px;
+  cursor: grab;
+  transition: all 0.15s;
+  user-select: none;
+}
+.task-card:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+.task-card.dragging { opacity: 0.4; cursor: grabbing; }
+.task-card.drag-placeholder {
+  border: 1px dashed var(--accent);
+  background: var(--accent-dim);
+  height: 60px;
+  border-radius: 9px;
+}
+
+.card-name {
+  font-size: 12px;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  cursor: pointer;
 }
-.task-name.done { text-decoration: line-through; color: var(--text-muted); }
+.card-name:hover { color: var(--accent); }
 
-.task-badges { display: flex; gap: 5px; flex-shrink: 0; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
 
+.card-badges { display: flex; gap: 4px; }
 .badge {
   font-size: 9px;
-  letter-spacing: 0.08em;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 4px;
   border: 1px solid;
 }
@@ -225,34 +239,239 @@ body {
 .badge-moyen { color: var(--yellow); border-color: rgba(232,200,122,0.3); }
 .badge-lourd { color: var(--red); border-color: rgba(224,122,109,0.3); }
 
-.task-delete {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+.card-due {
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.card-due.overdue { color: var(--red); }
+
+.card-actions { display: flex; gap: 4px; margin-top: 8px; }
+.card-btn {
+  flex: 1;
+  padding: 4px 0;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.06em;
+}
+.card-btn:hover { color: var(--text); border-color: var(--border-hover); }
+.card-btn.delete:hover { color: var(--red); border-color: rgba(224,122,109,0.4); }
+
+/* ── List view ── */
+.list-view {
+  padding: 0 28px 40px;
+  opacity: 0;
+  animation: fadeUp 0.5s ease 0.2s forwards;
+  display: none;
+}
+
+.list-group { margin-bottom: 24px; }
+.group-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.group-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  margin-bottom: 3px;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.list-item:hover { background: var(--surface); border-color: var(--border); }
+
+.list-check {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+}
+.list-check:hover { border-color: var(--green); }
+.list-check.done { background: var(--green); border-color: var(--green); color: #111; }
+
+.list-name { flex: 1; font-size: 12px; color: var(--text); }
+.list-name.done { text-decoration: line-through; color: var(--text-muted); }
+
+.list-delete {
+  width: 22px; height: 22px;
+  border-radius: 5px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-dim);
-  font-size: 11px;
+  font-size: 10px;
   cursor: pointer;
   transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+}
+.list-item:hover .list-delete { opacity: 1; }
+.list-delete:hover { border-color: rgba(224,122,109,0.4); color: var(--red); }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  padding: 24px;
   opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
 }
-.task-item:hover .task-delete { opacity: 1; }
-.task-delete:hover { border-color: rgba(224,122,109,0.4); color: var(--red); background: var(--red-dim); }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
 
-.empty {
-  text-align: center;
-  padding: 48px 0;
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 28px;
+  transform: translateY(16px);
+  transition: transform 0.25s ease;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.modal-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px;
+  font-style: italic;
+  outline: none;
+  line-height: 1.3;
+  padding: 0;
+}
+.modal-title-input::placeholder { color: var(--text-dim); }
+
+.modal-close {
+  background: var(--surface2);
+  border: 1px solid var(--border);
   color: var(--text-muted);
-  font-size: 12px;
-  letter-spacing: 0.08em;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.modal-close:hover { color: var(--text); border-color: var(--border-hover); }
+
+.modal-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-/* Toast */
+.modal-field { margin-bottom: 16px; }
+.modal-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.modal-textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  min-height: 100px;
+  transition: border-color 0.2s;
+}
+.modal-textarea:focus { border-color: var(--border-hover); }
+.modal-textarea::placeholder { color: var(--text-dim); }
+
+.modal-date-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  width: 100%;
+}
+.modal-date-input:focus { border-color: var(--border-hover); }
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  gap: 10px;
+}
+
+.modal-created {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+}
+
+.btn-save {
+  background: var(--accent);
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-save:hover { background: #f0d48a; }
+
+/* ── Toast ── */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -261,9 +480,9 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 10px 18px;
+  padding: 9px 16px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.06em;
   z-index: 200;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -272,6 +491,9 @@ body {
 .toast.show { transform: translateX(-50%) translateY(0); }
 .toast.success { border-color: rgba(109,189,122,0.4); color: var(--green); }
 .toast.error { border-color: rgba(224,122,109,0.4); color: var(--red); }
+
+/* ── Loading ── */
+.loading { text-align: center; padding: 60px; color: var(--text-muted); font-size: 12px; letter-spacing: 0.08em; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
@@ -283,206 +505,389 @@ body {
 
 <div class="toast" id="toast"></div>
 
-<div class="page">
-  <div class="header">
-    <div class="title">To<em>do</em></div>
-    <div class="task-count" id="taskCount">—</div>
-  </div>
-
-  <div class="add-form">
-    <div class="add-input-row">
-      <input class="add-input" id="taskInput" type="text" placeholder="Nouvelle tâche..." autocomplete="off">
-      <button class="add-btn" onclick="addTask()">+</button>
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <input class="modal-title-input" id="modalTitle" placeholder="Nom de la tâche...">
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="add-meta">
-      <div class="select-group">
-        <button class="pill active-statut-aujourd" data-group="statut" data-value="Aujourd'hui" onclick="selectPill(this,'statut')">Aujourd'hui</button>
-        <button class="pill" data-group="statut" data-value="Cette semaine" onclick="selectPill(this,'statut')">Semaine</button>
-        <button class="pill" data-group="statut" data-value="Backlog" onclick="selectPill(this,'statut')">Backlog</button>
-      </div>
-      <div class="select-group">
-        <button class="pill" data-group="effort" data-value="Petit" onclick="selectPill(this,'effort')">Petit</button>
-        <button class="pill active-effort-moyen" data-group="effort" data-value="Moyen" onclick="selectPill(this,'effort')">Moyen</button>
-        <button class="pill" data-group="effort" data-value="Lourd" onclick="selectPill(this,'effort')">Lourd</button>
-      </div>
+    <div class="modal-meta" id="modalMeta"></div>
+    <div class="modal-field">
+      <div class="modal-label">Notes</div>
+      <textarea class="modal-textarea" id="modalNotes" placeholder="Ajouter des notes..."></textarea>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Date d'échéance</div>
+      <input type="date" class="modal-date-input" id="modalDue">
+    </div>
+    <div class="modal-footer">
+      <div class="modal-created" id="modalCreated"></div>
+      <button class="btn-save" onclick="saveModal()">Sauvegarder</button>
     </div>
   </div>
-
-  <div class="filters">
-    <button class="filter-btn active" onclick="setFilter(this,'all')">Tout</button>
-    <button class="filter-btn" onclick="setFilter(this,'Aujourd\'hui')">Aujourd'hui</button>
-    <button class="filter-btn" onclick="setFilter(this,'Cette semaine')">Cette semaine</button>
-    <button class="filter-btn" onclick="setFilter(this,'Backlog')">Backlog</button>
-    <button class="filter-btn" onclick="setFilter(this,'Fait')">Fait</button>
-  </div>
-
-  <div class="task-list" id="taskList"></div>
 </div>
+
+<!-- Header -->
+<div class="header">
+  <div class="title">To<em>do</em></div>
+  <div class="header-right">
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnKanban" onclick="switchView('kanban')">Kanban</button>
+      <button class="view-btn" id="btnList" onclick="switchView('list')">Liste</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add form -->
+<div class="add-form">
+  <div class="add-input-row">
+    <input class="add-input" id="taskInput" type="text" placeholder="Nouvelle tâche..." autocomplete="off">
+    <button class="add-btn" onclick="addTask()">+</button>
+  </div>
+  <div class="add-meta">
+    <button class="pill active-s-aujourd" data-g="statut" data-v="Aujourd'hui" onclick="selectPill(this,'statut')">Aujourd'hui</button>
+    <button class="pill" data-g="statut" data-v="Cette semaine" onclick="selectPill(this,'statut')">Semaine</button>
+    <button class="pill" data-g="statut" data-v="Backlog" onclick="selectPill(this,'statut')">Backlog</button>
+    <button class="pill" data-g="effort" data-v="Petit" onclick="selectPill(this,'effort')">Petit</button>
+    <button class="pill active-e-moyen" data-g="effort" data-v="Moyen" onclick="selectPill(this,'effort')">Moyen</button>
+    <button class="pill" data-g="effort" data-v="Lourd" onclick="selectPill(this,'effort')">Lourd</button>
+  </div>
+</div>
+
+<!-- Kanban view -->
+<div class="kanban" id="kanbanView">
+  <div class="loading">Chargement...</div>
+</div>
+
+<!-- List view -->
+<div class="list-view" id="listView"></div>
 
 <script>
 // ─── Supabase ─────────────────────────────────────────────────────
-const SUPABASE_URL = 'https://uupzcgtmjcwivpeiinqf.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1cHpjZ3RtamN3aXZwZWlpbnFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDk3OTUsImV4cCI6MjA4Nzc4NTc5NX0.1gNomJJbUcvSbRYe-RG-mARBzpwo5UZh8ikSGrmwkGE';
+const SB_URL = 'https://uupzcgtmjcwivpeiinqf.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1cHpjZ3RtamN3aXZwZWlpbnFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDk3OTUsImV4cCI6MjA4Nzc4NTc5NX0.1gNomJJbUcvSbRYe-RG-mARBzpwo5UZh8ikSGrmwkGE';
 
-async function sbFetch(path, options = {}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...options,
+async function sb(path, opts = {}) {
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    ...opts,
     headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation',
-      ...options.headers
+      ...(opts.headers || {})
     }
   });
   if (!res.ok) throw new Error(await res.text());
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  const t = await res.text();
+  return t ? JSON.parse(t) : null;
 }
 
 // ─── State ────────────────────────────────────────────────────────
 let tasks = [];
-let currentFilter = 'all';
+let currentView = 'kanban';
 let selectedStatut = "Aujourd'hui";
 let selectedEffort = 'Moyen';
+let modalTaskId = null;
+let dragId = null;
+let placeholder = null;
 
+const COLS = [
+  { key: "Aujourd'hui", label: "Aujourd'hui", color: 'var(--red)' },
+  { key: "Cette semaine", label: "Cette semaine", color: 'var(--yellow)' },
+  { key: "Backlog", label: "Backlog", color: 'var(--text-muted)' },
+  { key: "Fait", label: "Fait ✓", color: 'var(--green)' }
+];
+
+// ─── Init ─────────────────────────────────────────────────────────
 document.getElementById('taskInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addTask();
 });
 
 fetchTasks();
 
-// ─── Fetch ────────────────────────────────────────────────────────
 async function fetchTasks() {
-  document.getElementById('taskList').innerHTML = `
-    <div style="padding:20px 0; color:var(--text-muted); font-size:12px; text-align:center; letter-spacing:0.08em">Chargement...</div>`;
   try {
-    tasks = await sbFetch('todos?order=created_at.desc');
+    tasks = await sb('todos?order=created_at.desc');
     render();
   } catch(e) {
-    document.getElementById('taskList').innerHTML = `<div class="empty">Erreur de chargement</div>`;
+    document.getElementById('kanbanView').innerHTML = `<div class="loading">Erreur de chargement</div>`;
   }
 }
 
 // ─── Render ───────────────────────────────────────────────────────
 function render() {
-  const filtered = currentFilter === 'all'
-    ? tasks.filter(t => t.statut !== 'Fait')
-    : tasks.filter(t => t.statut === currentFilter);
-
-  const total = tasks.filter(t => t.statut !== 'Fait').length;
-  document.getElementById('taskCount').textContent = total + ' tâche' + (total > 1 ? 's' : '');
-
-  if (filtered.length === 0) {
-    document.getElementById('taskList').innerHTML = `<div class="empty">Aucune tâche ici 🌿</div>`;
-    return;
-  }
-
-  const order = ["Aujourd'hui", "Cette semaine", "Backlog", "Fait"];
-  const labels = { "Aujourd'hui": "Aujourd'hui", "Cette semaine": "Cette semaine", "Backlog": "Backlog", "Fait": "Fait ✓" };
-
-  const groups = {};
-  filtered.forEach(t => {
-    if (!groups[t.statut]) groups[t.statut] = [];
-    groups[t.statut].push(t);
-  });
-
-  let html = '';
-  order.forEach(statut => {
-    if (!groups[statut]) return;
-    html += `<div class="task-group">
-      <div class="group-label">${labels[statut]} <span style="color:var(--text-dim)">${groups[statut].length}</span></div>`;
-    groups[statut].forEach(t => {
-      const done = t.statut === 'Fait';
-      const effortClass = t.effort ? `badge-${t.effort.toLowerCase()}` : '';
-      html += `<div class="task-item">
-        <div class="task-check ${done ? 'done' : ''}" onclick="toggleDone('${t.id}')">${done ? '✓' : ''}</div>
-        <div class="task-name ${done ? 'done' : ''}">${t.name}</div>
-        <div class="task-badges">
-          ${t.effort ? `<span class="badge ${effortClass}">${t.effort}</span>` : ''}
-        </div>
-        <button class="task-delete" onclick="deleteTask('${t.id}')">✕</button>
-      </div>`;
-    });
-    html += '</div>';
-  });
-
-  document.getElementById('taskList').innerHTML = html;
+  currentView === 'kanban' ? renderKanban() : renderList();
 }
 
-// ─── Add ──────────────────────────────────────────────────────────
+function renderKanban() {
+  const view = document.getElementById('kanbanView');
+  view.innerHTML = '';
+  COLS.forEach(col => {
+    const colTasks = tasks.filter(t => t.statut === col.key);
+    const colEl = document.createElement('div');
+    colEl.className = 'kanban-col';
+    colEl.dataset.col = col.key;
+    colEl.innerHTML = `
+      <div class="col-header">
+        <div class="col-title" style="color:${col.color}">${col.label}</div>
+        <div class="col-count">${colTasks.length}</div>
+      </div>
+      <div class="col-body" id="col-${col.key.replace(/'/g,'')}"></div>`;
+    view.appendChild(colEl);
+
+    const body = colEl.querySelector('.col-body');
+    colTasks.forEach(t => body.appendChild(makeCard(t)));
+
+    // Drop events
+    colEl.addEventListener('dragover', onDragOver);
+    colEl.addEventListener('dragleave', onDragLeave);
+    colEl.addEventListener('drop', e => onDrop(e, col.key));
+  });
+}
+
+function makeCard(t) {
+  const el = document.createElement('div');
+  el.className = 'task-card';
+  el.draggable = true;
+  el.dataset.id = t.id;
+
+  const due = t.due_date ? formatDate(t.due_date) : null;
+  const overdue = t.due_date && new Date(t.due_date) < new Date() && t.statut !== 'Fait';
+  const effortClass = t.effort ? `badge-${t.effort.toLowerCase()}` : '';
+
+  el.innerHTML = `
+    <div class="card-name" onclick="openModal('${t.id}')">${t.name}</div>
+    <div class="card-footer">
+      <div class="card-badges">
+        ${t.effort ? `<span class="badge ${effortClass}">${t.effort}</span>` : ''}
+      </div>
+      ${due ? `<div class="card-due ${overdue ? 'overdue' : ''}">${due}</div>` : ''}
+    </div>
+    <div class="card-actions">
+      <button class="card-btn" onclick="openModal('${t.id}')">détail</button>
+      <button class="card-btn delete" onclick="deleteTask('${t.id}')">supprimer</button>
+    </div>`;
+
+  el.addEventListener('dragstart', e => onDragStart(e, t.id));
+  el.addEventListener('dragend', onDragEnd);
+  return el;
+}
+
+function renderList() {
+  const view = document.getElementById('listView');
+  view.innerHTML = '';
+  const order = ["Aujourd'hui", "Cette semaine", "Backlog", "Fait"];
+  order.forEach(statut => {
+    const group = tasks.filter(t => t.statut === statut);
+    if (!group.length) return;
+    const div = document.createElement('div');
+    div.className = 'list-group';
+    div.innerHTML = `<div class="group-label">${statut === 'Fait' ? 'Fait ✓' : statut} <span style="color:var(--text-dim)">${group.length}</span></div>`;
+    group.forEach(t => {
+      const item = document.createElement('div');
+      item.className = 'list-item';
+      const done = t.statut === 'Fait';
+      item.innerHTML = `
+        <div class="list-check ${done ? 'done' : ''}" onclick="event.stopPropagation();toggleDone('${t.id}')">${done ? '✓' : ''}</div>
+        <div class="list-name ${done ? 'done' : ''}">${t.name}</div>
+        <button class="list-delete" onclick="event.stopPropagation();deleteTask('${t.id}')">✕</button>`;
+      item.addEventListener('click', () => openModal(t.id));
+      div.appendChild(item);
+    });
+    view.appendChild(div);
+  });
+  if (!view.innerHTML) view.innerHTML = `<div class="loading">Aucune tâche 🌿</div>`;
+}
+
+// ─── Drag & drop ──────────────────────────────────────────────────
+function onDragStart(e, id) {
+  dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+
+function onDragEnd(e) {
+  e.target.classList.remove('dragging');
+  if (placeholder) { placeholder.remove(); placeholder = null; }
+  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-over'));
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  const col = e.currentTarget;
+  col.classList.add('drag-over');
+  const body = col.querySelector('.col-body');
+  if (!placeholder) {
+    placeholder = document.createElement('div');
+    placeholder.className = 'drag-placeholder';
+  }
+  const afterEl = getDragAfterElement(body, e.clientY);
+  if (!afterEl) body.appendChild(placeholder);
+  else body.insertBefore(placeholder, afterEl);
+}
+
+function onDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+
+async function onDrop(e, newStatut) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!dragId) return;
+
+  const task = tasks.find(t => t.id === dragId);
+  if (task && task.statut !== newStatut) {
+    task.statut = newStatut;
+    renderKanban();
+    try {
+      await sb(`todos?id=eq.${dragId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ statut: newStatut })
+      });
+    } catch(e) { fetchTasks(); }
+  }
+  dragId = null;
+}
+
+function getDragAfterElement(container, y) {
+  const els = [...container.querySelectorAll('.task-card:not(.dragging)')];
+  return els.reduce((closest, el) => {
+    const box = el.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) return { offset, el };
+    return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).el;
+}
+
+// ─── CRUD ─────────────────────────────────────────────────────────
 async function addTask() {
   const input = document.getElementById('taskInput');
   const name = input.value.trim();
   if (!name) return;
-
   input.value = '';
-
   try {
-    const created = await sbFetch('todos', {
+    const created = await sb('todos', {
       method: 'POST',
-      body: JSON.stringify({ name, statut: selectedStatut, effort: selectedEffort })
+      body: JSON.stringify({ name, statut: selectedStatut, effort: selectedEffort, notes: '' })
     });
     tasks.unshift(created[0]);
     render();
     showToast('Tâche ajoutée ✓', 'success');
-  } catch(e) {
-    showToast('Erreur', 'error');
-  }
+  } catch(e) { showToast('Erreur', 'error'); }
 }
 
-// ─── Toggle done ──────────────────────────────────────────────────
 async function toggleDone(id) {
   const t = tasks.find(t => t.id === id);
   if (!t) return;
-  const newStatut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
+  const newStatut = t.statut === 'Fait' ? "Aujourd'hui" : 'Fait';
   t.statut = newStatut;
   render();
   try {
-    await sbFetch(`todos?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ statut: newStatut })
-    });
-  } catch(e) {
-    t.statut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
-    render();
-  }
+    await sb(`todos?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ statut: newStatut }) });
+  } catch(e) { fetchTasks(); }
 }
 
-// ─── Delete ───────────────────────────────────────────────────────
 async function deleteTask(id) {
   tasks = tasks.filter(t => t.id !== id);
   render();
-  showToast('Tâche supprimée', 'success');
+  showToast('Supprimée', 'success');
   try {
-    await sbFetch(`todos?id=eq.${id}`, { method: 'DELETE' });
-  } catch(e) {
-    fetchTasks();
-  }
+    await sb(`todos?id=eq.${id}`, { method: 'DELETE', headers: { 'Prefer': '' } });
+  } catch(e) { fetchTasks(); }
 }
 
-// ─── Filters & pills ─────────────────────────────────────────────
-function setFilter(btn, filter) {
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentFilter = filter;
+// ─── Modal ────────────────────────────────────────────────────────
+function openModal(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  modalTaskId = id;
+
+  document.getElementById('modalTitle').value = t.name;
+  document.getElementById('modalNotes').value = t.notes || '';
+  document.getElementById('modalDue').value = t.due_date || '';
+  document.getElementById('modalCreated').textContent = 'Créée le ' + formatDate(t.created_at);
+
+  // Meta chips
+  const meta = document.getElementById('modalMeta');
+  const statutColor = t.statut === "Aujourd'hui" ? 'var(--red)' : t.statut === 'Cette semaine' ? 'var(--yellow)' : t.statut === 'Fait' ? 'var(--green)' : '#6b6560';
+  const effortColor = t.effort === 'Petit' ? 'var(--green)' : t.effort === 'Lourd' ? 'var(--red)' : 'var(--yellow)';
+  meta.innerHTML = `
+    <span style="font-size:10px;padding:4px 10px;border-radius:6px;border:1px solid;color:${statutColor};border-color:${statutColor};background:${statutColor}15">${t.statut}</span>
+    ${t.effort ? `<span style="font-size:10px;padding:4px 10px;border-radius:6px;border:1px solid;color:${effortColor};border-color:${effortColor};background:${effortColor}15">${t.effort}</span>` : ''}`;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('modalTitle').focus();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  modalTaskId = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+async function saveModal() {
+  if (!modalTaskId) return;
+  const name = document.getElementById('modalTitle').value.trim();
+  const notes = document.getElementById('modalNotes').value;
+  const due_date = document.getElementById('modalDue').value || null;
+  if (!name) return;
+
+  const t = tasks.find(t => t.id === modalTaskId);
+  if (t) { t.name = name; t.notes = notes; t.due_date = due_date; }
+
+  closeModal();
+  render();
+  showToast('Sauvegardé ✓', 'success');
+
+  try {
+    await sb(`todos?id=eq.${modalTaskId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ name, notes, due_date })
+    });
+  } catch(e) { fetchTasks(); }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ─── View switch ──────────────────────────────────────────────────
+function switchView(view) {
+  currentView = view;
+  document.getElementById('kanbanView').style.display = view === 'kanban' ? 'flex' : 'none';
+  document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
+  document.getElementById('btnKanban').classList.toggle('active', view === 'kanban');
+  document.getElementById('btnList').classList.toggle('active', view === 'list');
   render();
 }
 
+// ─── Pills ────────────────────────────────────────────────────────
 function selectPill(el, group) {
-  document.querySelectorAll(`[data-group="${group}"]`).forEach(p => p.className = 'pill');
-  const val = el.dataset.value;
+  document.querySelectorAll(`[data-g="${group}"]`).forEach(p => p.className = 'pill');
+  const v = el.dataset.v;
   if (group === 'statut') {
-    selectedStatut = val;
-    const key = val === "Aujourd'hui" ? 'aujourd' : val === "Cette semaine" ? 'semaine' : 'backlog';
-    el.classList.add(`active-statut-${key}`);
+    selectedStatut = v;
+    const k = v === "Aujourd'hui" ? 'aujourd' : v === "Cette semaine" ? 'semaine' : 'backlog';
+    el.classList.add(`active-s-${k}`);
   } else {
-    selectedEffort = val;
-    el.classList.add(`active-effort-${val.toLowerCase()}`);
+    selectedEffort = v;
+    el.classList.add(`active-e-${v.toLowerCase()}`);
   }
 }
 
-// ─── Toast ────────────────────────────────────────────────────────
+// ─── Utils ────────────────────────────────────────────────────────
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d + (d.includes('T') ? '' : 'T12:00:00')).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
