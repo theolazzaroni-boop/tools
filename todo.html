@@ -34,15 +34,11 @@ body {
   font-family: 'DM Mono', monospace;
   font-weight: 300;
   min-height: 100vh;
-  padding: 40px 24px 120px;
+  padding: 40px 24px 80px;
 }
 
-.page {
-  max-width: 600px;
-  margin: 0 auto;
-}
+.page { max-width: 600px; margin: 0 auto; }
 
-/* Header */
 .header {
   display: flex;
   align-items: baseline;
@@ -59,17 +55,9 @@ body {
   color: var(--text);
   letter-spacing: -0.02em;
 }
+.title em { font-style: italic; color: var(--accent); }
 
-.title em {
-  font-style: italic;
-  color: var(--accent);
-}
-
-.task-count {
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
-}
+.task-count { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; }
 
 /* Add form */
 .add-form {
@@ -82,11 +70,7 @@ body {
   animation: fadeUp 0.5s ease 0.1s forwards;
 }
 
-.add-input-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
+.add-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
 
 .add-input {
   flex: 1;
@@ -111,7 +95,7 @@ body {
   border-radius: 8px;
   width: 42px;
   height: 42px;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -120,19 +104,10 @@ body {
   flex-shrink: 0;
 }
 .add-btn:hover { background: #f0d48a; transform: scale(1.05); }
-.add-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-.add-meta {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.add-meta { display: flex; gap: 8px; flex-wrap: wrap; }
 
-/* Select pills */
-.select-group {
-  display: flex;
-  gap: 4px;
-}
+.select-group { display: flex; gap: 4px; }
 
 .pill {
   padding: 5px 10px;
@@ -184,14 +159,9 @@ body {
 .filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
 /* Task list */
-.task-list {
-  opacity: 0;
-  animation: fadeUp 0.5s ease 0.3s forwards;
-}
+.task-list { opacity: 0; animation: fadeUp 0.5s ease 0.3s forwards; }
 
-.task-group {
-  margin-bottom: 28px;
-}
+.task-group { margin-bottom: 28px; }
 
 .group-label {
   font-size: 9px;
@@ -209,12 +179,11 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 11px 14px;
   border-radius: 10px;
   border: 1px solid transparent;
   margin-bottom: 4px;
   transition: all 0.15s;
-  cursor: default;
 }
 .task-item:hover { background: var(--surface); border-color: var(--border); }
 
@@ -243,11 +212,7 @@ body {
 }
 .task-name.done { text-decoration: line-through; color: var(--text-muted); }
 
-.task-badges {
-  display: flex;
-  gap: 5px;
-  flex-shrink: 0;
-}
+.task-badges { display: flex; gap: 5px; flex-shrink: 0; }
 
 .badge {
   font-size: 9px;
@@ -259,7 +224,6 @@ body {
 .badge-petit { color: var(--green); border-color: rgba(109,189,122,0.3); }
 .badge-moyen { color: var(--yellow); border-color: rgba(232,200,122,0.3); }
 .badge-lourd { color: var(--red); border-color: rgba(224,122,109,0.3); }
-.badge-projet { color: var(--text-muted); border-color: var(--border); }
 
 .task-delete {
   width: 26px;
@@ -268,7 +232,7 @@ body {
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.15s;
   display: flex;
@@ -279,29 +243,13 @@ body {
 }
 .task-item:hover .task-delete { opacity: 1; }
 .task-delete:hover { border-color: rgba(224,122,109,0.4); color: var(--red); background: var(--red-dim); }
+
 .empty {
   text-align: center;
   padding: 48px 0;
   color: var(--text-muted);
   font-size: 12px;
   letter-spacing: 0.08em;
-}
-
-/* Loading */
-.loading-row {
-  display: flex;
-  gap: 8px;
-  padding: 12px 14px;
-}
-.loading-bar {
-  height: 12px;
-  background: var(--surface2);
-  border-radius: 4px;
-  animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
 }
 
 /* Toast */
@@ -341,19 +289,18 @@ body {
     <div class="task-count" id="taskCount">—</div>
   </div>
 
-  <!-- Add form -->
   <div class="add-form">
     <div class="add-input-row">
       <input class="add-input" id="taskInput" type="text" placeholder="Nouvelle tâche..." autocomplete="off">
-      <button class="add-btn" id="addBtn" onclick="addTask()">+</button>
+      <button class="add-btn" onclick="addTask()">+</button>
     </div>
     <div class="add-meta">
-      <div class="select-group" id="statutGroup">
-        <button class="pill active-statut-aujourd" data-group="statut" data-value="Aujourd-hui" onclick="selectPill(this,'statut')">Aujourd'hui</button>
+      <div class="select-group">
+        <button class="pill active-statut-aujourd" data-group="statut" data-value="Aujourd'hui" onclick="selectPill(this,'statut')">Aujourd'hui</button>
         <button class="pill" data-group="statut" data-value="Cette semaine" onclick="selectPill(this,'statut')">Semaine</button>
         <button class="pill" data-group="statut" data-value="Backlog" onclick="selectPill(this,'statut')">Backlog</button>
       </div>
-      <div class="select-group" id="effortGroup">
+      <div class="select-group">
         <button class="pill" data-group="effort" data-value="Petit" onclick="selectPill(this,'effort')">Petit</button>
         <button class="pill active-effort-moyen" data-group="effort" data-value="Moyen" onclick="selectPill(this,'effort')">Moyen</button>
         <button class="pill" data-group="effort" data-value="Lourd" onclick="selectPill(this,'effort')">Lourd</button>
@@ -361,94 +308,62 @@ body {
     </div>
   </div>
 
-  <!-- Filters -->
   <div class="filters">
-    <button class="filter-btn active" data-filter="all" onclick="setFilter(this,'all')">Tout</button>
-    <button class="filter-btn" data-filter="Aujourd-hui" onclick="setFilter(this,'Aujourd-hui')">Aujourd'hui</button>
-    <button class="filter-btn" data-filter="Cette semaine" onclick="setFilter(this,'Cette semaine')">Cette semaine</button>
-    <button class="filter-btn" data-filter="Backlog" onclick="setFilter(this,'Backlog')">Backlog</button>
-    <button class="filter-btn" data-filter="Fait" onclick="setFilter(this,'Fait')">Fait</button>
+    <button class="filter-btn active" onclick="setFilter(this,'all')">Tout</button>
+    <button class="filter-btn" onclick="setFilter(this,'Aujourd\'hui')">Aujourd'hui</button>
+    <button class="filter-btn" onclick="setFilter(this,'Cette semaine')">Cette semaine</button>
+    <button class="filter-btn" onclick="setFilter(this,'Backlog')">Backlog</button>
+    <button class="filter-btn" onclick="setFilter(this,'Fait')">Fait</button>
   </div>
 
-  <!-- Task list -->
-  <div class="task-list" id="taskList">
-    <div class="loading-row"><div class="loading-bar" style="width:60%"></div></div>
-    <div class="loading-row"><div class="loading-bar" style="width:45%"></div></div>
-    <div class="loading-row"><div class="loading-bar" style="width:70%"></div></div>
-  </div>
+  <div class="task-list" id="taskList"></div>
 </div>
 
 <script>
-const NOTION_TOKEN = 'ntn_S5332019737XeGhmYV27wTmuV3fnKie0zwkvjyQSzHLgoz';
-const DB_ID = '31413dd02a198136b86ece3429eff276';
-const WEBHOOK_ADD = 'https://orus.app.n8n.cloud/webhook/todo-add';
-const WEBHOOK_DELETE = 'https://orus.app.n8n.cloud/webhook/todo-delete';
+// ─── Storage ──────────────────────────────────────────────────────
+function loadTasks() {
+  try { return JSON.parse(localStorage.getItem('tasks') || '[]'); }
+  catch { return []; }
+}
 
-let tasks = [];
+function saveTasks(tasks) {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// ─── State ────────────────────────────────────────────────────────
+let tasks = loadTasks();
 let currentFilter = 'all';
-let selectedStatut = 'Aujourd-hui';
+let selectedStatut = "Aujourd'hui";
 let selectedEffort = 'Moyen';
 
-// ─── Init ─────────────────────────────────────────────────────────
 document.getElementById('taskInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addTask();
 });
 
-loadTasks();
-
-// ─── Load tasks ───────────────────────────────────────────────────
-async function loadTasks() {
-  try {
-    const res = await fetch(`https://api.notion.com/v1/databases/${DB_ID}/query`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${NOTION_TOKEN}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        sorts: [{ property: 'Statut', direction: 'ascending' }],
-        page_size: 100
-      })
-    });
-
-    const data = await res.json();
-    tasks = data.results.map(p => ({
-      id: p.id,
-      name: p.properties.Tache?.title?.[0]?.plain_text || '—',
-      statut: p.properties.Statut?.select?.name || 'Backlog',
-      effort: p.properties.Effort?.select?.name || '',
-      projet: p.properties.Projet?.select?.name || ''
-    }));
-
-    renderTasks();
-  } catch (e) {
-    document.getElementById('taskList').innerHTML = `<div class="empty">Erreur de chargement</div>`;
-  }
-}
+render();
 
 // ─── Render ───────────────────────────────────────────────────────
-function renderTasks() {
+function render() {
   const filtered = currentFilter === 'all'
     ? tasks.filter(t => t.statut !== 'Fait')
     : tasks.filter(t => t.statut === currentFilter);
 
-  document.getElementById('taskCount').textContent = filtered.length + ' tâche' + (filtered.length > 1 ? 's' : '');
+  const total = tasks.filter(t => t.statut !== 'Fait').length;
+  document.getElementById('taskCount').textContent = total + ' tâche' + (total > 1 ? 's' : '');
 
   if (filtered.length === 0) {
     document.getElementById('taskList').innerHTML = `<div class="empty">Aucune tâche ici 🌿</div>`;
     return;
   }
 
-  // Group by statut
+  const order = ["Aujourd'hui", "Cette semaine", "Backlog", "Fait"];
+  const labels = { "Aujourd'hui": "Aujourd'hui", "Cette semaine": "Cette semaine", "Backlog": "Backlog", "Fait": "Fait ✓" };
+
   const groups = {};
   filtered.forEach(t => {
     if (!groups[t.statut]) groups[t.statut] = [];
     groups[t.statut].push(t);
   });
-
-  const order = ["Aujourd-hui", "Cette semaine", "Backlog", "Fait"];
-  const labels = { "Aujourd-hui": "Aujourd'hui", "Cette semaine": "Cette semaine", "Backlog": "Backlog", "Fait": "Fait ✓" };
 
   let html = '';
   order.forEach(statut => {
@@ -458,14 +373,13 @@ function renderTasks() {
     groups[statut].forEach(t => {
       const done = t.statut === 'Fait';
       const effortClass = t.effort ? `badge-${t.effort.toLowerCase()}` : '';
-      html += `<div class="task-item" id="task-${t.id}">
-        <div class="task-check ${done ? 'done' : ''}" onclick="toggleDone('${t.id}','${t.statut}')">${done ? '✓' : ''}</div>
+      html += `<div class="task-item">
+        <div class="task-check ${done ? 'done' : ''}" onclick="toggleDone('${t.id}')">${done ? '✓' : ''}</div>
         <div class="task-name ${done ? 'done' : ''}">${t.name}</div>
         <div class="task-badges">
           ${t.effort ? `<span class="badge ${effortClass}">${t.effort}</span>` : ''}
-          ${t.projet ? `<span class="badge badge-projet">${t.projet}</span>` : ''}
         </div>
-        ${!t.temp ? `<button class="task-delete" onclick="deleteTask('${t.id}')" title="Supprimer">✕</button>` : ''}
+        <button class="task-delete" onclick="deleteTask('${t.id}')">✕</button>
       </div>`;
     });
     html += '</div>';
@@ -474,116 +388,57 @@ function renderTasks() {
   document.getElementById('taskList').innerHTML = html;
 }
 
-// ─── Add task ─────────────────────────────────────────────────────
-async function addTask() {
+// ─── Add ──────────────────────────────────────────────────────────
+function addTask() {
   const input = document.getElementById('taskInput');
   const name = input.value.trim();
   if (!name) return;
 
-  const btn = document.getElementById('addBtn');
-  btn.disabled = true;
-  btn.textContent = '…';
+  tasks.unshift({
+    id: crypto.randomUUID(),
+    name,
+    statut: selectedStatut,
+    effort: selectedEffort,
+    createdAt: new Date().toISOString()
+  });
 
-  try {
-    await fetch(WEBHOOK_ADD, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tache: name,
-        statut: selectedStatut,
-        effort: selectedEffort,
-        projet: '',
-        notes: ''
-      })
-    });
-
-    // Add optimistically to local list avec flag temp
-    tasks.unshift({ id: Date.now().toString(), name, statut: selectedStatut, effort: selectedEffort, projet: '', temp: true });
-    input.value = '';
-    renderTasks();
-    showToast('Tâche ajoutée ✓', 'success');
-
-    // Reload after short delay to get real ID
-    setTimeout(loadTasks, 1500);
-  } catch (e) {
-    showToast('Erreur : ' + e.message, 'error');
-  }
-
-  btn.disabled = false;
-  btn.textContent = '+';
-}
-
-// ─── Delete task ─────────────────────────────────────────────────
-async function deleteTask(id) {
-  // Formater l'ID avec tirets pour Notion
-  const formatId = id.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5');
-
-  // Optimistic remove
-  const el = document.getElementById('task-' + id);
-  if (el) { el.style.opacity = '0.3'; el.style.pointerEvents = 'none'; }
-  tasks = tasks.filter(t => t.id !== id);
-
-  try {
-    await fetch(WEBHOOK_DELETE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page_id: formatId })
-    });
-    renderTasks();
-    showToast('Tâche supprimée', 'success');
-  } catch (e) {
-    showToast('Erreur', 'error');
-    loadTasks();
-  }
+  saveTasks(tasks);
+  input.value = '';
+  render();
+  showToast('Tâche ajoutée ✓', 'success');
 }
 
 // ─── Toggle done ──────────────────────────────────────────────────
-async function toggleDone(id, currentStatut) {
-  const newStatut = currentStatut === 'Fait' ? 'Backlog' : 'Fait';
-
-  // Optimistic update
-  const task = tasks.find(t => t.id === id);
-  if (task) task.statut = newStatut;
-  renderTasks();
-
-  try {
-    await fetch(`https://api.notion.com/v1/pages/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${NOTION_TOKEN}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      },
-      body: JSON.stringify({
-        properties: {
-          Statut: { select: { name: newStatut } }
-        }
-      })
-    });
-  } catch (e) {
-    // Rollback
-    if (task) task.statut = currentStatut;
-    renderTasks();
-    showToast('Erreur', 'error');
-  }
+function toggleDone(id) {
+  const t = tasks.find(t => t.id === id);
+  if (!t) return;
+  t.statut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
+  saveTasks(tasks);
+  render();
 }
 
-// ─── Filters ──────────────────────────────────────────────────────
+// ─── Delete ───────────────────────────────────────────────────────
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  saveTasks(tasks);
+  render();
+  showToast('Tâche supprimée', 'success');
+}
+
+// ─── Filters & pills ─────────────────────────────────────────────
 function setFilter(btn, filter) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   currentFilter = filter;
-  renderTasks();
+  render();
 }
 
 function selectPill(el, group) {
-  document.querySelectorAll(`[data-group="${group}"]`).forEach(p => {
-    p.className = 'pill';
-  });
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(p => p.className = 'pill');
   const val = el.dataset.value;
   if (group === 'statut') {
     selectedStatut = val;
-    const key = val === "Aujourd-hui" ? 'aujourd' : val === "Cette semaine" ? 'semaine' : 'backlog';
+    const key = val === "Aujourd'hui" ? 'aujourd' : val === "Cette semaine" ? 'semaine' : 'backlog';
     el.classList.add(`active-statut-${key}`);
   } else {
     selectedEffort = val;
