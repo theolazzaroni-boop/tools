@@ -320,18 +320,28 @@ body {
 </div>
 
 <script>
-// ─── Storage ──────────────────────────────────────────────────────
-function loadTasks() {
-  try { return JSON.parse(localStorage.getItem('tasks') || '[]'); }
-  catch { return []; }
-}
+// ─── Supabase ─────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://uupzcgtmjcwivpeiinqf.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1cHpjZ3RtamN3aXZwZWlpbnFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDk3OTUsImV4cCI6MjA4Nzc4NTc5NX0.1gNomJJbUcvSbRYe-RG-mARBzpwo5UZh8ikSGrmwkGE';
 
-function saveTasks(tasks) {
-  localStorage.setItem('tasks', JSON.stringify(tasks));
+async function sbFetch(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...options.headers
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // ─── State ────────────────────────────────────────────────────────
-let tasks = loadTasks();
+let tasks = [];
 let currentFilter = 'all';
 let selectedStatut = "Aujourd'hui";
 let selectedEffort = 'Moyen';
@@ -340,7 +350,19 @@ document.getElementById('taskInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addTask();
 });
 
-render();
+fetchTasks();
+
+// ─── Fetch ────────────────────────────────────────────────────────
+async function fetchTasks() {
+  document.getElementById('taskList').innerHTML = `
+    <div style="padding:20px 0; color:var(--text-muted); font-size:12px; text-align:center; letter-spacing:0.08em">Chargement...</div>`;
+  try {
+    tasks = await sbFetch('todos?order=created_at.desc');
+    render();
+  } catch(e) {
+    document.getElementById('taskList').innerHTML = `<div class="empty">Erreur de chargement</div>`;
+  }
+}
 
 // ─── Render ───────────────────────────────────────────────────────
 function render() {
@@ -389,40 +411,54 @@ function render() {
 }
 
 // ─── Add ──────────────────────────────────────────────────────────
-function addTask() {
+async function addTask() {
   const input = document.getElementById('taskInput');
   const name = input.value.trim();
   if (!name) return;
 
-  tasks.unshift({
-    id: crypto.randomUUID(),
-    name,
-    statut: selectedStatut,
-    effort: selectedEffort,
-    createdAt: new Date().toISOString()
-  });
-
-  saveTasks(tasks);
   input.value = '';
-  render();
-  showToast('Tâche ajoutée ✓', 'success');
+
+  try {
+    const created = await sbFetch('todos', {
+      method: 'POST',
+      body: JSON.stringify({ name, statut: selectedStatut, effort: selectedEffort })
+    });
+    tasks.unshift(created[0]);
+    render();
+    showToast('Tâche ajoutée ✓', 'success');
+  } catch(e) {
+    showToast('Erreur', 'error');
+  }
 }
 
 // ─── Toggle done ──────────────────────────────────────────────────
-function toggleDone(id) {
+async function toggleDone(id) {
   const t = tasks.find(t => t.id === id);
   if (!t) return;
-  t.statut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
-  saveTasks(tasks);
+  const newStatut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
+  t.statut = newStatut;
   render();
+  try {
+    await sbFetch(`todos?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ statut: newStatut })
+    });
+  } catch(e) {
+    t.statut = t.statut === 'Fait' ? 'Backlog' : 'Fait';
+    render();
+  }
 }
 
 // ─── Delete ───────────────────────────────────────────────────────
-function deleteTask(id) {
+async function deleteTask(id) {
   tasks = tasks.filter(t => t.id !== id);
-  saveTasks(tasks);
   render();
   showToast('Tâche supprimée', 'success');
+  try {
+    await sbFetch(`todos?id=eq.${id}`, { method: 'DELETE' });
+  } catch(e) {
+    fetchTasks();
+  }
 }
 
 // ─── Filters & pills ─────────────────────────────────────────────
