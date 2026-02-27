@@ -520,36 +520,36 @@ async function submitToNotion() {
 
   const semaineName = 'Semaine du ' + new Date(state.date + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const prompt = `Tu es un assistant qui crée des entrées dans une base de données Notion. 
-Utilise l'outil MCP Notion pour créer une nouvelle page dans la base de données avec l'ID "31413dd02a1981adaa13c102a31311e9" avec ces propriétés exactes :
-- Semaine (title): "${semaineName}"
-- Note globale (number): ${state.note}
-- Énergie (select): "${state.energie}"
-- Équilibre pro-perso (select): "${state.equilibre}"
-- Discipline (select): "${state.discipline}"
-- Principal accomplissement (rich_text): "${state.accomplissement || ''}"
-- Principal blocage (rich_text): "${state.blocage || ''}"
-- Intention semaine suivante (rich_text): "${state.intention || ''}"
-- Date (date): "${state.date}"
-
-Crée la page et réponds uniquement avec "OK" si ça a réussi, ou "ERREUR: [message]" si ça a échoué.`;
+  const payload = {
+    parent: { database_id: '31413dd02a1981adaa13c102a31311e9' },
+    properties: {
+      Semaine: { title: [{ text: { content: semaineName } }] },
+      'Note globale': { number: state.note },
+      'Énergie': { select: { name: state.energie } },
+      'Équilibre pro-perso': { select: { name: state.equilibre } },
+      'Discipline': { select: { name: state.discipline } },
+      'Principal accomplissement': { rich_text: [{ text: { content: state.accomplissement || '' } }] },
+      'Principal blocage': { rich_text: [{ text: { content: state.blocage || '' } }] },
+      'Intention semaine suivante': { rich_text: [{ text: { content: state.intention || '' } }] },
+      'Date': { date: { start: state.date } }
+    }
+  };
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        mcp_servers: [{ type: 'url', url: 'https://mcp.notion.com/mcp', name: 'notion' }],
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: {
+        'Authorization': 'Bearer ntn_S5332019737XeGhmYV27wTmuV3fnKie0zwkvjyQSzHLgoz',
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
-    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-
-    if (text.includes('ERREUR')) throw new Error(text.replace('ERREUR:', '').trim());
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Erreur Notion');
+    }
 
     btn.classList.remove('loading');
     btn.classList.add('success');
