@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a1a0f;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --text: #e8f0e2;
+  --text-muted: #6b8a62;
+  --accent: #a8d878;
+  --accent2: #f0b84a;
+  --accent-dim: #4a7a38;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 10% 100%, #0d2a08 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 90% 0%, #1a2d08 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 50% 50%, #071510 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.leaf {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.leaf-1 { top: -5%; left: -3%; color: #1a4020; width: 220px; transform: rotate(-20deg); animation: sway1 8s ease-in-out infinite, fadeLeaf 1s ease 0.2s forwards; }
+.leaf-2 { top: -8%; right: -4%; color: #143518; width: 280px; transform: rotate(15deg) scaleX(-1); animation: sway2 10s ease-in-out infinite, fadeLeaf 1s ease 0.5s forwards; }
+.leaf-3 { bottom: -5%; left: -5%; color: #1f4a25; width: 250px; transform: rotate(30deg); animation: sway1 9s ease-in-out infinite reverse, fadeLeaf 1s ease 0.8s forwards; }
+.leaf-4 { bottom: -8%; right: -3%; color: #162e1a; width: 200px; transform: rotate(-25deg) scaleX(-1); animation: sway2 11s ease-in-out infinite reverse, fadeLeaf 1s ease 1s forwards; }
+
+.leaf svg { fill: currentColor; width: 100%; height: auto; }
+
+#rainCanvas {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 1s ease;
+}
+#rainCanvas.visible { opacity: 0.25; }
+
+.container {
+  width: 500px;
+  max-width: 95vw;
+  position: relative;
+  z-index: 10;
+  padding: 0 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 44px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.3s forwards;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 26px;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.logo span { color: var(--accent2); font-style: normal; }
+
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.sound-toggle:hover { border-color: var(--accent-dim); color: var(--accent); }
+.sound-toggle.active { border-color: var(--accent); color: var(--accent); background: rgba(168,216,120,0.06); }
+
+.step { display: none; opacity: 0; }
+.step.active { display: block; animation: fadeUp 0.5s ease forwards; }
+
+.step-num {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.step-num em { color: var(--accent2); font-style: normal; }
+
+.question {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1.45;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+
+textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  resize: none;
+  height: 100px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+textarea:focus { border-color: var(--accent-dim); }
+textarea::placeholder { color: var(--text-muted); }
+
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.choice {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.choice:hover { border-color: var(--accent-dim); background: rgba(168,216,120,0.04); }
+.choice.selected { border-color: var(--accent); background: rgba(168,216,120,0.08); }
+.choice-icon { font-size: 18px; margin-bottom: 6px; }
+.choice-label { font-size: 13px; letter-spacing: 0.06em; color: var(--text); margin-bottom: 3px; }
+.choice-desc { font-size: 10px; color: var(--text-muted); letter-spacing: 0.04em; line-height: 1.5; }
+
+.consigne {
+  background: linear-gradient(135deg, rgba(168,216,120,0.06) 0%, rgba(240,184,74,0.04) 100%);
+  border: 1px solid rgba(168,216,120,0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  line-height: 1.9;
+  color: var(--text);
+}
+.consigne strong { color: var(--accent2); font-weight: 400; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 18px 0;
+  color: var(--text-muted);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0 16px;
+}
+
+.timer-ring {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 20px;
+}
+.timer-ring svg { transform: rotate(-90deg); }
+.timer-ring circle { fill: none; stroke-width: 1.5; }
+.timer-ring .track { stroke: rgba(255,255,255,0.06); }
+.timer-ring .progress {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 6px rgba(168,216,120,0.4));
+}
+
+.timer-display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.timer-time {
+  font-family: 'Playfair Display', serif;
+  font-size: 34px;
+  font-weight: 400;
+  color: var(--text);
+}
+.timer-sub {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.breathe-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.breathe-scene {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.breathe-ring-outer {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 1px solid rgba(168,216,120,0.1);
+}
+.breathe-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,216,120,0.25) 0%, rgba(168,216,120,0.05) 70%);
+  border: 1px solid rgba(168,216,120,0.3);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+.breathe-circle.inhale { animation: inhaleAnim 4s ease-in-out forwards; }
+.breathe-circle.hold { transform: scale(1.5); opacity: 1; }
+.breathe-circle.exhale { animation: exhaleAnim 6s ease-in-out forwards; }
+
+.breathe-phase {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+  min-height: 16px;
+  text-align: center;
+}
+.breathe-count {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.btn-row { display: flex; gap: 10px; margin-top: 24px; }
+
+.btn {
+  flex: 1;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: none;
+}
+.btn-primary { background: var(--accent); color: #0a1a0f; font-weight: 400; }
+.btn-primary:hover { background: #bde890; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.btn-secondary { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent-dim); color: var(--text); }
+.btn-warm { background: rgba(240,184,74,0.1); color: var(--accent2); border: 1px solid rgba(240,184,74,0.2); width: 100%; margin-bottom: 4px; }
+.btn-warm:hover { background: rgba(240,184,74,0.18); }
+
+.final-wrap { text-align: center; padding: 12px 0; }
+.final-title {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.final-sub { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 24px; }
+.final-task {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text);
+  background: var(--surface);
+  border-left: 2px solid var(--accent2);
+  padding: 14px 20px;
+  border-radius: 0 10px 10px 0;
+  margin: 0 0 20px;
+  text-align: left;
+  line-height: 1.5;
+}
+.final-note { font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; line-height: 1.8; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeLeaf { to { opacity: 1; } }
+@keyframes sway1 {
+  0%, 100% { transform: rotate(-20deg) translateX(0); }
+  50% { transform: rotate(-15deg) translateX(8px); }
+}
+@keyframes sway2 {
+  0%, 100% { transform: rotate(15deg) scaleX(-1) translateX(0); }
+  50% { transform: rotate(10deg) scaleX(-1) translateX(-6px); }
+}
+@keyframes inhaleAnim {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(1.5); opacity: 1; }
+}
+@keyframes exhaleAnim {
+  from { transform: scale(1.5); opacity: 1; }
+  to { transform: scale(1); opacity: 0.7; }
+}
+</style>
+</head>
+<body>
+
+<div class="leaf leaf-1">
+  <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100,10 C140,40 180,100 160,200 C140,280 80,300 60,260 C20,200 0,100 40,40 C60,10 80,0 100,10 Z"/>
+  </svg>
+</div>
+<div class="leaf leaf-2">
+  <svg viewBox="0 0 240 340" xmlns="http://www.w3.org/2000/svg">
+    <path d="M120,5 C170,35 210,110 190,220 C170,310 90,340 65,295 C20,230 0,110 50,45 C75,10 95,0 120,5 Z"/>
+  </svg>
+</div>
+<div class="leaf leaf-3">
+  <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100,5 C145,30 175,90 155,185 C138,265 75,290 52,248 C15,188 5,90 45,35 C65,8 82,0 100,5 Z"/>
+  </svg>
+</div>
+<div class="leaf leaf-4">
+  <svg viewBox="0 0 180 260" xmlns="http://www.w3.org/2000/svg">
+    <path d="M90,5 C130,30 160,85 142,175 C126,248 68,270 46,230 C12,172 4,82 42,30 C60,7 75,0 90,5 Z"/>
+  </svg>
+</div>
+
+<canvas id="rainCanvas"></canvas>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">re<span>·</span>set</div>
+    <button class="sound-toggle" id="soundBtn" onclick="toggleSound()">
+      <span>🌧</span>
+      <span id="soundLabel">pluie</span>
+    </button>
+  </div>
+
+  <div class="step active" id="step1">
+    <div class="step-num"><em>01</em> — 04</div>
+    <div class="question">Qu'est-ce que tu fais là, en ce moment ?</div>
+    <textarea id="q1" placeholder="Je suis en train de..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep(2)">Continuer</button>
+    </div>
+  </div>
+
+  <div class="step" id="step2">
+    <div class="step-num"><em>02</em> — 04</div>
+    <div class="question">Quelle tâche est-ce que tu évites ?</div>
+    <textarea id="q2" placeholder="La tâche que j'évite c'est..."></textarea>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Retour</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Continuer</button>
+    </div>
+  </div>
+
+  <div class="step" id="step3">
+    <div class="step-num"><em>03</em> — 04</div>
+    <div class="question">Pourquoi tu l'évites ?</div>
+    <div class="choices">
+      <div class="choice" onclick="selectChoice(this,'flou')">
+        <div class="choice-icon">🌫</div>
+        <div class="choice-label">Flou</div>
+        <div class="choice-desc">Je ne sais pas par où commencer</div>
+      </div>
+      <div class="choice" onclick="selectChoice(this,'anxiogene')">
+        <div class="choice-icon">🌊</div>
+        <div class="choice-label">Anxiogène</div>
+        <div class="choice-desc">Ça me stresse d'y penser</div>
+      </div>
+      <div class="choice" onclick="selectChoice(this,'ennuyeux')">
+        <div class="choice-icon">🍃</div>
+        <div class="choice-label">Ennuyeux</div>
+        <div class="choice-desc">Pas d'intérêt, je repousse</div>
+      </div>
+      <div class="choice" onclick="selectChoice(this,'lourd')">
+        <div class="choice-icon">🪨</div>
+        <div class="choice-label">Trop lourd</div>
+        <div class="choice-desc">Trop gros, je ne sais pas où couper</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(2)">← Retour</button>
+      <button class="btn btn-primary" id="step3Next" onclick="goStep(4)" disabled>Continuer</button>
+    </div>
+  </div>
+
+  <div class="step" id="step4">
+    <div class="step-num"><em>04</em> — 04 · <span style="color:var(--accent)">action</span></div>
+    <div class="consigne" id="consigneBox"></div>
+    <div class="divider">ou d'abord</div>
+    <button class="btn btn-warm" onclick="showMeditation()">🌿 &nbsp; Méditer 2 minutes</button>
+
+    <div id="timerSection">
+      <div class="timer-wrap">
+        <div class="timer-ring">
+          <svg width="130" height="130" viewBox="0 0 130 130">
+            <circle class="track" cx="65" cy="65" r="58"/>
+            <circle class="progress" id="timerProgress" cx="65" cy="65" r="58"
+              stroke-dasharray="364.4" stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-display">
+            <div class="timer-time" id="timerDisplay">25:00</div>
+            <div class="timer-sub">focus</div>
+          </div>
+        </div>
+        <div class="btn-row" style="width:100%">
+          <button class="btn btn-primary" id="timerBtn" onclick="toggleTimer()">Démarrer</button>
+          <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="meditSection" style="display:none">
+      <div class="breathe-wrap">
+        <div class="breathe-scene">
+          <div class="breathe-ring-outer"></div>
+          <div class="breathe-circle" id="breatheCircle"></div>
+        </div>
+        <div class="breathe-phase" id="breathePhase">Prêt ?</div>
+        <div class="breathe-count" id="breatheCount">7 cycles · ~2 minutes</div>
+        <div class="btn-row" style="width:100%; margin-top:16px">
+          <button class="btn btn-primary" id="breatheBtn" onclick="toggleBreathe()">Commencer</button>
+          <button class="btn btn-secondary" onclick="showTimer()">← Timer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" id="stepFinal">
+    <div class="final-wrap">
+      <div class="final-title">C'est parti.</div>
+      <div class="final-sub">Ta prochaine action</div>
+      <div class="final-task" id="finalTask"></div>
+      <div class="final-note">Ferme tout. Lance le timer.<br>Fais uniquement ça.</div>
+    </div>
+    <div class="btn-row" style="margin-top:32px">
+      <button class="btn btn-primary" onclick="restart()">Nouveau reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Rain Canvas ──────────────────────────────────────────────────
+const canvas = document.getElementById('rainCanvas');
+const ctx2 = canvas.getContext('2d');
+let drops = [], rainAnimId = null, rainVisible = false;
+
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function initDrops() {
+  drops = [];
+  for (let i = 0; i < 140; i++) {
+    drops.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      length: Math.random() * 14 + 7,
+      speed: Math.random() * 5 + 7,
+      opacity: Math.random() * 0.35 + 0.08,
+      width: Math.random() * 0.7 + 0.3
+    });
+  }
+}
+
+function drawRain() {
+  ctx2.clearRect(0, 0, canvas.width, canvas.height);
+  drops.forEach(d => {
+    ctx2.beginPath();
+    ctx2.moveTo(d.x, d.y);
+    ctx2.lineTo(d.x - d.length * 0.15, d.y + d.length);
+    ctx2.strokeStyle = `rgba(180,230,180,${d.opacity})`;
+    ctx2.lineWidth = d.width;
+    ctx2.stroke();
+    d.y += d.speed;
+    d.x -= d.speed * 0.15;
+    if (d.y > canvas.height) { d.y = -d.length; d.x = Math.random() * canvas.width; }
+  });
+  rainAnimId = requestAnimationFrame(drawRain);
+}
+
+// ─── Audio ────────────────────────────────────────────────────────
+let soundOn = false, audioCtx = null, masterGain = null;
+let rainSrc = null, windSrc = null;
+
+function makeRain(ctx) {
+  const sr = ctx.sampleRate;
+  const buf = ctx.createBuffer(1, sr * 4, sr);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  // Bandpass étroit = pluie fine et douce, pas agressive
+  const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2800; bp.Q.value = 0.4;
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000;
+  const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 3000;
+  const g = ctx.createGain(); g.gain.value = 0.12;
+  src.connect(bp); bp.connect(lp); lp.connect(lp2); lp2.connect(g);
+  return { src, g };
+}
+
+function makeWind(ctx) {
+  const sr = ctx.sampleRate;
+  const buf = ctx.createBuffer(1, sr * 6, sr);
+  const d = buf.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < d.length; i++) {
+    d[i] = (last + 0.015 * (Math.random() * 2 - 1)) / 1.015;
+    last = d[i];
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf; src.loop = true;
+  // Double lowpass très bas = souffle doux, presque imperceptible
+  const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 180;
+  const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 120;
+  const g = ctx.createGain(); g.gain.value = 0.18;
+  src.connect(lp); lp.connect(lp2); lp2.connect(g);
+  return { src, g };
+}
+
+function toggleSound() {
+  const btn = document.getElementById('soundBtn');
+  const label = document.getElementById('soundLabel');
+  if (!soundOn) {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 1;
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const r = makeRain(audioCtx); r.g.connect(masterGain); r.src.start(); rainSrc = r.src;
+    const w = makeWind(audioCtx); w.g.connect(masterGain); w.src.start(); windSrc = w.src;
+    soundOn = true; btn.classList.add('active'); label.textContent = 'on';
+    if (!rainVisible) { initDrops(); canvas.classList.add('visible'); rainVisible = true; drawRain(); }
+  } else {
+    if (rainSrc) { rainSrc.stop(); rainSrc = null; }
+    if (windSrc) { windSrc.stop(); windSrc = null; }
+    soundOn = false; btn.classList.remove('active'); label.textContent = 'pluie';
+    canvas.classList.remove('visible'); rainVisible = false;
+    if (rainAnimId) { cancelAnimationFrame(rainAnimId); rainAnimId = null; }
+    ctx2.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// ─── Steps ────────────────────────────────────────────────────────
+let selectedReason = null;
+
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  if (n === 4) buildConsigne();
+  const el = document.getElementById('step' + n);
+  if (el) el.classList.add('active');
+}
+
+function selectChoice(el, reason) {
+  document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedReason = reason;
+  document.getElementById('step3Next').disabled = false;
+}
+
+function buildConsigne() {
+  const box = document.getElementById('consigneBox');
+  const c = {
+    flou: `<strong>Clarifier d'abord.</strong> Prends 2 minutes pour écrire en une phrase ce que serait le résultat concret si cette tâche était terminée. Puis identifie la toute première action physique — pas "réfléchir à", mais "ouvrir", "écrire", "appeler". Lance le timer et fais uniquement cette première action.`,
+    anxiogene: `<strong>Réduire la taille.</strong> L'anxiété vient souvent de l'ampleur perçue. Demande-toi : quelle est la version la plus petite possible de cette tâche que tu pourrais faire en 10 minutes ? Commence par ça, rien d'autre. Le reste attendra.`,
+    ennuyeux: `<strong>Contrat court.</strong> Tu n'as pas à aimer cette tâche. Tu as juste à la faire 25 minutes. Après ça, tu es libre. Lance le timer, fais-le, basta.`,
+    lourd: `<strong>Découper maintenant.</strong> Passe 5 minutes à découper cette tâche en 3 sous-tâches concrètes. Écris-les dans ta todo. Ensuite, attaque uniquement la première. Oublie les deux autres pour l'instant.`
+  };
+  box.innerHTML = c[selectedReason] || c.flou;
+}
+
+// ─── Timer ────────────────────────────────────────────────────────
+let timerInterval = null, timerSeconds = 25*60, timerRunning = false;
+const TOTAL = 25*60, CIRC = 364.4;
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false;
+    document.getElementById('timerBtn').textContent = 'Reprendre';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerBtn').textContent = 'Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateTimerUI();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById('timerBtn').textContent = 'Terminé ✓';
+        setTimeout(showFinal, 800);
+      }
+    }, 1000);
+  }
+}
+
+function updateTimerUI() {
+  const m = Math.floor(timerSeconds/60), s = timerSeconds%60;
+  document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('timerProgress').style.strokeDashoffset = CIRC * (timerSeconds/TOTAL);
+}
+
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = TOTAL;
+  updateTimerUI(); document.getElementById('timerBtn').textContent = 'Démarrer';
+}
+
+// ─── Meditation ───────────────────────────────────────────────────
+let breatheTimeout = null, breatheRunning = false, cycleCount = 0;
+
+function showMeditation() {
+  document.getElementById('timerSection').style.display = 'none';
+  document.getElementById('meditSection').style.display = 'block';
+}
+
+function showTimer() {
+  stopBreathe();
+  document.getElementById('meditSection').style.display = 'none';
+  document.getElementById('timerSection').style.display = 'block';
+}
+
+function toggleBreathe() { breatheRunning ? stopBreathe() : startBreathe(); }
+
+function startBreathe() {
+  breatheRunning = true; cycleCount = 0;
+  document.getElementById('breatheBtn').textContent = 'Arrêter';
+  runCycle();
+}
+
+function runCycle() {
+  if (!breatheRunning) return;
+  const circle = document.getElementById('breatheCircle');
+  const phase = document.getElementById('breathePhase');
+  const count = document.getElementById('breatheCount');
+  phase.textContent = 'Inspire...';
+  circle.className = 'breathe-circle inhale';
+  breatheTimeout = setTimeout(() => {
+    if (!breatheRunning) return;
+    phase.textContent = 'Retiens...';
+    circle.className = 'breathe-circle hold';
+    breatheTimeout = setTimeout(() => {
+      if (!breatheRunning) return;
+      phase.textContent = 'Expire...';
+      circle.className = 'breathe-circle exhale';
+      breatheTimeout = setTimeout(() => {
+        if (!breatheRunning) return;
+        cycleCount++;
+        count.textContent = `Cycle ${cycleCount} / 7`;
+        if (cycleCount >= 7) {
+          stopBreathe();
+          phase.textContent = 'Bien. 🌿';
+          count.textContent = 'Tu es prêt.';
+          setTimeout(showTimer, 2000);
+        } else { runCycle(); }
+      }, 6000);
+    }, 2000);
+  }, 4000);
+}
+
+function stopBreathe() {
+  clearTimeout(breatheTimeout); breatheRunning = false;
+  document.getElementById('breatheBtn').textContent = 'Commencer';
+  document.getElementById('breatheCircle').className = 'breathe-circle';
+  document.getElementById('breathePhase').textContent = 'Prêt ?';
+  document.getElementById('breatheCount').textContent = '7 cycles · ~2 minutes';
+}
+
+// ─── Final ────────────────────────────────────────────────────────
+function showFinal() {
+  const task = document.getElementById('q2').value || 'ta tâche';
+  document.getElementById('finalTask').textContent = task;
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepFinal').classList.add('active');
+}
+
+function restart() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('q1').value = '';
+  document.getElementById('q2').value = '';
+  selectedReason = null;
+  document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+  document.getElementById('step3Next').disabled = true;
+  resetTimer(); stopBreathe(); showTimer();
+}
+</script>
+</body>
+</html>
