@@ -519,6 +519,9 @@ async function addTask() {
 
 // ─── Delete task ─────────────────────────────────────────────────
 async function deleteTask(id) {
+  // Formater l'ID avec tirets pour Notion
+  const formatId = id.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5');
+
   // Optimistic remove
   const el = document.getElementById('task-' + id);
   if (el) { el.style.opacity = '0.3'; el.style.pointerEvents = 'none'; }
@@ -528,7 +531,7 @@ async function deleteTask(id) {
     await fetch(WEBHOOK_DELETE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page_id: id })
+      body: JSON.stringify({ page_id: formatId })
     });
     renderTasks();
     showToast('Tâche supprimée', 'success');
